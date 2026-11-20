@@ -15,6 +15,8 @@ model Song {
   lyrics      String?  @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  genre       Genre    @relation(fields: [genreId], references: [id])
+  genreId     Int
 }
 
 model Genre {
@@ -22,4 +24,5 @@ model Genre {
   name      String   @db.VarChar(50)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  songs     Song[]
 }
