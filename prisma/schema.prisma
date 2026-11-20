@@ -16,3 +16,10 @@ model Song {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
