@@ -21,7 +21,7 @@ model Song {
 
 model Genre {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(50)
+  name      String   @unique @db.VarChar(50)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   songs     Song[]
