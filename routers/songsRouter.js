@@ -63,10 +63,30 @@ router.get('/:id', async (req, res) => {
 })
 
 //Store 
-router.post('/', (req, res) => {
-    const { id } = req.body
+router.post('/', async (req, res) => {
+    const { title, artist, releaseDate, lyrics, genreId } = req.body;
 
-    res.send(`Creazione canzone numero ${id}`);
+
+
+    const genre = await prisma.genre.findUnique({
+        where: {
+            id: genreId
+        }
+    })
+
+    if (!genre) return sendErrors(res, 404, 'genreId does not exist')
+
+    const newSong = await prisma.song.create({
+        data: {
+            title,
+            artist,
+            releaseDate,
+            lyrics,
+            genreId,
+        }
+    })
+
+    res.sendStatus(201)
 })
 
 //Update 
