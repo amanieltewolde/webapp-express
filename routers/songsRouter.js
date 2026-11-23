@@ -29,9 +29,38 @@ router.get('/', async (req, res) => {
 })
 
 //Show 
-router.get('/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Canzone numero ${id}`);
+router.get('/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({
+            error: 'Invalid Id',
+        })
+    }
+
+    const song = await prisma.song.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            genre: {
+                select: {
+                    id: true,
+                    name: true,
+                }
+            }
+        }, omit: {
+            genreId: true,
+        }
+    })
+
+    if (!song) {
+        return res.status(404).json({
+            error: 'Song you were looking for does not exist',
+        })
+    }
+
+    res.json(song);
 })
 
 //Store 
