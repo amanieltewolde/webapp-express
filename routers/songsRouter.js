@@ -1,5 +1,6 @@
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
+import sendErrors from "../lib/utlities/sendErrors.js";
 
 const router = Router();
 
@@ -32,10 +33,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const id = Number(req.params.id);
 
+    // Validazione formato ID
     if (!Number.isInteger(id)) {
-        return res.status(400).json({
-            error: 'Invalid Id',
-        })
+        return sendErrors(res, 400, 'Invalid Id')
     }
 
     const song = await prisma.song.findUnique({
@@ -54,10 +54,9 @@ router.get('/:id', async (req, res) => {
         }
     })
 
+    // Validazione esistenza ID
     if (!song) {
-        return res.status(404).json({
-            error: 'Song you were looking for does not exist',
-        })
+        return sendErrors(res, 404, 'Song you are looking for does not exist')
     }
 
     res.json(song);
@@ -66,6 +65,7 @@ router.get('/:id', async (req, res) => {
 //Store 
 router.post('/', (req, res) => {
     const { id } = req.body
+
     res.send(`Creazione canzone numero ${id}`);
 })
 
