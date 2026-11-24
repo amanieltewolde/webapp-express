@@ -143,10 +143,31 @@ router.patch('/:id', async (req, res) => {
 })
 
 // Delete
-router.delete('/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Eliminazione canzone numero ${id}`);
+router.delete('/:id', async (req, res) => {
+    const id = Number(req.params.id);
 
+    // Validazione formato ID
+    if (!Number.isInteger(id)) {
+        return sendErrors(res, 400, 'Invalid Id');
+    }
+
+    // Validazione esistenza ID
+    const song = await prisma.song.findUnique({
+        where: {
+            id,
+        }
+    })
+    if (!song) {
+        return sendErrors(res, 404, 'Song Id you are looking for does not exist')
+    }
+
+    await prisma.song.delete({
+        where: {
+            id,
+        }
+    })
+
+    res.sendStatus(204);
 })
 
 export default router
