@@ -96,9 +96,50 @@ router.post('/', async (req, res) => {
 })
 
 //Update 
-router.patch('/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Modifica canzone numero ${id}`);
+router.patch('/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    // Validazione formato ID
+    if (!Number.isInteger(id)) {
+        return sendErrors(res, 400, 'Invalid Id')
+    }
+
+    // Validazione esistenza ID 
+    const song = await prisma.song.findUnique({
+        where: {
+            id,
+        }
+    })
+    if (!song) {
+        return sendErrors(res, 404, 'Song Id you are updating for does not exist')
+    }
+
+    const { title, artist, releaseDate, lyrics, genreId } = req.body;
+
+    // Validazione esistenza genreId in db
+    if (genreId) {
+        const genre = await prisma.genre.findUnique({
+            where: {
+                id: genreId
+            }
+        })
+        if (!genre) return sendErrors(res, 404, 'genreId does not exist')
+    }
+
+    const updatedSong = await prisma.song.update({
+        where: {
+            id,
+        },
+        data: {
+            title,
+            artist,
+            releaseDate,
+            lyrics,
+            genreId,
+        }
+    })
+
+    res.json(updatedSong);
 })
 
 // Delete
