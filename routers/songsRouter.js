@@ -1,6 +1,8 @@
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
 import sendErrors from "../lib/utlities/sendErrors.js";
+import isValidYear from "../lib/utlities/isValidYear.js";
+import isValidString from "../lib/utlities/isValidString.js";
 
 const router = Router();
 
@@ -66,7 +68,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
     const { title, artist, releaseDate, lyrics, genreId } = req.body;
 
-
+    // Validazione dati in ingresso dal client
+    if (!isValidYear(releaseDate) || !isValidString(title) || !isValidString(artist)) {
+        return sendErrors(res, 400, 'Title, artist and releaseDate are required datas')
+    }
 
     const genre = await prisma.genre.findUnique({
         where: {
@@ -74,6 +79,7 @@ router.post('/', async (req, res) => {
         }
     })
 
+    // Validazione esistenza genreId in db
     if (!genre) return sendErrors(res, 404, 'genreId does not exist')
 
     const newSong = await prisma.song.create({
